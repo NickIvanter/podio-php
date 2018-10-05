@@ -37,7 +37,12 @@ class PodioFile extends PodioObject {
    * @see https://developers.podio.com/doc/files/upload-file-1004361
    */
   public static function upload($file_path, $file_name) {
-    return self::member(Podio::post("/file/v2/", array('source' => '@'.realpath($file_path), 'filename' => $file_name), array('upload' => TRUE, 'filesize' => filesize($file_path))));
+    if (function_exists('curl_file_create')) {
+        $source = curl_file_create($file_path);
+    } else {
+        $source = '@'.realpath($file_path);
+    }
+    return self::member(Podio::post("/file/v2/", array('source' => $source, 'filename' => $file_name), array('upload' => TRUE, 'filesize' => filesize($file_path))));
   }
 
   /**
